@@ -1,0 +1,9 @@
+# Reference documents - DO NOT UPLOAD
+docs_ref/
+*.pdf
+*.docx
+*.pptx
+# Ignore toàn bộ file PDF/ PPTX / DOCX không phải spec của bạn
+docs/*.pdf
+docs/*.pptx
+docs/*.docx
