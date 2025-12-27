@@ -1,47 +1,47 @@
 module sync_fifo #(
-   parameter int DATA_WIDTH = 8,
-   parameter int DEPTH      = 8
+   parameter integer DATA_WIDTH = 8,
+   parameter integer DEPTH      = 8
 )(
    // input
-   input  logic                      clk,
-   input  logic                      sclr_n,
-   input  logic                      aclr_n,
-   input  logic [DATA_WIDTH-1:0]     din,
-   input  logic                      wr_en,
-   input  logic                      rd_en,
+   input  wire                      clk,
+   input  wire                      sclr_n,
+   input  wire                      aclr_n,
+   input  wire [DATA_WIDTH-1:0]     din,
+   input  wire                      wr_en,
+   input  wire                      rd_en,
 
    // output
-   output logic [DATA_WIDTH-1:0]     dout,
-   output logic                      full,
-   output logic                      almost_full,
-   output logic                      empty,
-   output logic                      almost_empty,
-   output logic                      overflow,
-   output logic [$clog2(DEPTH+1)-1:0] usedw,
+   output reg  [DATA_WIDTH-1:0]     dout,
+   output reg                       full,
+   output reg                       almost_full,
+   output reg                       empty,
+   output reg                       almost_empty,
+   output reg                       overflow,
+   output reg  [$clog2(DEPTH+1)-1:0] usedw,
 );
 
    // Register File
-   logic [DATA_WIDTH-1:0] mem [0:DEPTH-1];
+   reg  [DATA_WIDTH-1:0] mem [0:DEPTH-1];
    
    // Control
-   logic                       wr_allow;
-   logic                       rd_allow;
+   reg                        wr_allow;
+   reg                        rd_allow;
 
-   logic [$clog2(DEPTH)-1:0]   wr_ptr;
-   logic [$clog2(DEPTH)-1:0]   wr_ptr_next;
-   logic [$clog2(DEPTH)-1:0]   rd_ptr;
-   logic [$clog2(DEPTH)-1:0]   rd_ptr_next;
+   reg  [$clog2(DEPTH)-1:0]   wr_ptr;
+   reg  [$clog2(DEPTH)-1:0]   wr_ptr_next;
+   reg  [$clog2(DEPTH)-1:0]   rd_ptr;
+   reg  [$clog2(DEPTH)-1:0]   rd_ptr_next;
 
-   logic                       full_next;
-   logic                       almost_full_next;
-   logic                       empty_next;
-   logic                       almost_empty_next;
-   logic                       overflow_next;
-   logic [$clog2(DEPTH+1)-1:0] usedw_next;
-   logic [DATA_WIDTH-1:0]      rd_data;
+   reg                        full_next;
+   reg                        almost_full_next;
+   reg                        empty_next;
+   reg                        almost_empty_next;
+   reg                        overflow_next;
+   reg  [$clog2(DEPTH+1)-1:0] usedw_next;
+   reg  [DATA_WIDTH-1:0]      rd_data;
 
    // FIFO control
-   always_comb begin
+   always @(*) begin
        rd_allow = rd_en && !empty;
        wr_allow = wr_en && (!full || rd_allow);
    
@@ -49,8 +49,8 @@ module sync_fifo #(
        rd_ptr_next = rd_ptr;
        usedw_next  = usedw;
        overflow_next = overflow;
-   
-       unique case ({wr_allow, rd_allow})
+
+       case ({wr_allow, rd_allow})
            2'b01: begin
                rd_ptr_next = (rd_ptr == DEPTH-1) ? 0 : rd_ptr + 1;
                usedw_next  = usedw - 1;
@@ -67,6 +67,7 @@ module sync_fifo #(
            default: ; // 2'b00 không làm gì
        endcase
    
+       overflow_next = 1'b0;
        if (wr_en && full && !rd_en)
            overflow_next = 1'b1;
    
@@ -76,7 +77,7 @@ module sync_fifo #(
        almost_empty_next = (usedw_next <= 2);
    end
 
-   always_ff @(posedge clk or negedge aclr_n) begin
+   always @(posedge clk or negedge aclr_n) begin
 
       if(!aclr_n) begin 
          wr_ptr       <= '0;
@@ -112,8 +113,8 @@ module sync_fifo #(
 
    // FIFO Register
    assign rd_data = mem[rd_ptr];
-   
-   always_ff @(posedge clk or negedge aclr_n) begin
+
+   always @(posedge clk or negedge aclr_n) begin
       if(!aclr_n) dout <= '0;
       else if (!sclr_n) dout <= '0;
       else begin 
