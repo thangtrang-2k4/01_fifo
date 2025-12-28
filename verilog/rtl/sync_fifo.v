@@ -1,6 +1,8 @@
 module sync_fifo #(
    parameter integer DATA_WIDTH = 8,
-   parameter integer DEPTH      = 8
+   parameter integer DEPTH      = 8,
+   parameter         AF_LEVEL   = 1,
+   parameter         AE_LEVEL   = 1
 )(
    // input
    input  wire                      clk,
@@ -17,7 +19,7 @@ module sync_fifo #(
    output reg                       empty,
    output reg                       almost_empty,
    output reg                       overflow,
-   output reg  [$clog2(DEPTH+1)-1:0] usedw,
+   output reg  [$clog2(DEPTH+1)-1:0] usedw
 );
 
    // Register File
@@ -43,7 +45,7 @@ module sync_fifo #(
    // FIFO control
    always @(*) begin
        rd_allow = rd_en && !empty;
-       wr_allow = wr_en && (!full || rd_allow);
+       wr_allow = wr_en && !full;
    
        wr_ptr_next = wr_ptr;
        rd_ptr_next = rd_ptr;
@@ -72,9 +74,9 @@ module sync_fifo #(
            overflow_next = 1'b1;
    
        full_next         = (usedw_next == DEPTH);
-       almost_full_next  = (usedw_next >= DEPTH-2);
+       almost_full_next  = (usedw_next >= DEPTH - AF_LEVEL);
        empty_next        = (usedw_next == 0);
-       almost_empty_next = (usedw_next <= 2);
+       almost_empty_next = (usedw_next <= AE_LEVEL);
    end
 
    always @(posedge clk or negedge aclr_n) begin
@@ -112,8 +114,6 @@ module sync_fifo #(
    end
 
    // FIFO Register
-   assign rd_data = mem[rd_ptr];
-
    always @(posedge clk or negedge aclr_n) begin
       if(!aclr_n) dout <= '0;
       else if (!sclr_n) dout <= '0;
@@ -121,7 +121,7 @@ module sync_fifo #(
          if(wr_allow) mem[wr_ptr] <= din;
          else mem[wr_ptr] <= mem[wr_ptr];
 
-         if(rd_allow) dout <= rd_data;
+         if(rd_allow) dout <= mem[rd_ptr];
          else dout <= dout;
       end
    end

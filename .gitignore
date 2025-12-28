@@ -1,9 +1,45 @@
+# =====================================================
 # Reference documents - DO NOT UPLOAD
+# =====================================================
 docs_ref/
 *.pdf
 *.docx
 *.pptx
+
 # Ignore toàn bộ file PDF/ PPTX / DOCX không phải spec của bạn
 docs/*.pdf
 docs/*.pptx
 docs/*.docx
+
+
+# =====================================================
+# QuestaSim / ModelSim generated files
+# =====================================================
+
+# Library & compile artifacts
+**/work/
+**/_info
+**/_vmake
+**/_lib*.qdb
+**/_lib*.qpg
+**/_lib*.qtl
+
+# Optimized design & temp
+**/*_opt/
+**/*_temp*
+**/_tempmsg
+
+# Simulator config & logs
+**/modelsim.ini
+**/transcript
+**/*.log
+**/*.wlf
+
+
+# =====================================================
+# Editor / OS junk
+# =====================================================
+*~
+*.swp
+*.swo
+.DS_Store
