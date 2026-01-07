@@ -40,7 +40,6 @@ module sync_fifo #(
    reg                        almost_empty_next;
    reg                        overflow_next;
    reg  [$clog2(DEPTH+1)-1:0] usedw_next;
-   reg  [DATA_WIDTH-1:0]      rd_data;
 
    // FIFO control
    always @(*) begin

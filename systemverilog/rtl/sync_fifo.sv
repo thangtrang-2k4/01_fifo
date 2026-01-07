@@ -38,12 +38,11 @@ module sync_fifo #(
    logic                       almost_empty_next;
    logic                       overflow_next;
    logic [$clog2(DEPTH+1)-1:0] usedw_next;
-   logic [DATA_WIDTH-1:0]      rd_data;
 
    // FIFO control
    always_comb begin
        rd_allow = rd_en && !empty;
-       wr_allow = wr_en && (!full || rd_allow);
+       wr_allow = wr_en && !full;
    
        wr_ptr_next = wr_ptr;
        rd_ptr_next = rd_ptr;
@@ -111,8 +110,6 @@ module sync_fifo #(
    end
 
    // FIFO Register
-   assign rd_data = mem[rd_ptr];
-   
    always_ff @(posedge clk or negedge aclr_n) begin
       if(!aclr_n) dout <= '0;
       else if (!sclr_n) dout <= '0;
@@ -120,7 +117,7 @@ module sync_fifo #(
          if(wr_allow) mem[wr_ptr] <= din;
          else mem[wr_ptr] <= mem[wr_ptr];
 
-         if(rd_allow) dout <= rd_data;
+         if(rd_allow) dout <= mem[rd_ptr];
          else dout <= dout;
       end
    end

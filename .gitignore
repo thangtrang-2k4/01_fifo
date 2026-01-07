@@ -5,12 +5,9 @@ docs_ref/
 *.pdf
 *.docx
 *.pptx
-
-# Ignore toàn bộ file PDF/ PPTX / DOCX không phải spec của bạn
 docs/*.pdf
 docs/*.pptx
 docs/*.docx
-
 
 # =====================================================
 # QuestaSim / ModelSim generated files
@@ -34,7 +31,12 @@ docs/*.docx
 **/transcript
 **/*.log
 **/*.wlf
+**/wlft*
+**/vsim.dbg
 
+# Coverage (optional)
+**/cov*/
+**/*.ucdb
 
 # =====================================================
 # Editor / OS junk
@@ -42,4 +44,6 @@ docs/*.docx
 *~
 *.swp
 *.swo
+*.bak
+*.tmp
 .DS_Store
