@@ -117,15 +117,11 @@ module sync_fifo #(
       if(!aclr_n) dout <= '0;
       else if (!sclr_n) dout <= '0;
       else begin 
-         if (wr_allow)
-            mem[wr_ptr] <= din;
+         if(wr_allow) mem[wr_ptr] <= din;
+         else mem[wr_ptr] <= mem[wr_ptr];
 
-         if (rd_allow) begin
-            if (wr_allow && (wr_ptr == rd_ptr))
-               dout <= din; // forward new data when read+write same address
-            else
-               dout <= mem[rd_ptr];
-         end
+         if(rd_allow) dout <= mem[rd_ptr];
+         else dout <= dout;
       end
    end
 endmodule

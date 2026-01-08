@@ -5,9 +5,11 @@ docs_ref/
 *.pdf
 *.docx
 *.pptx
-docs_pre/*.pdf
-docs_pre/*.pptx
-docs_pre/*.docx
+docs_pre/
+*.pdf
+*.pptx
+*.docx
+*.xlsx
 
 # =====================================================
 # QuestaSim / ModelSim generated files
