@@ -460,30 +460,41 @@ module tb_sync_fifo;
     task rd_wr_comb_test;
         
         reg [$clog2(DEPTH+1)-1:0] usedw_pre;
+        integer i;
+        reg [DATA_WIDTH-1:0] data;
+
         begin
         
             $display("=== READ WRITE COMBINATION TEST ===");
             sync_reset();
-            write_one(8'h24);
-            write_one(8'h56);
-            write_one(8'h34);
             write_one(8'h98);
+            ref_fifo[0] = 8'h89;
             
-            #1;
-            usedw_pre = usedw;
-            @(posedge clk);
-            wr_en = 1;
-            rd_en = 1;
-            @(posedge clk);
-            #1;
-            wr_en = 0;
-            rd_en = 0;
-            if(usedw == usedw_pre)
-                $display("PASS usedw unchanged");
-            else
-                $display("ERORR usedw changed");
+            for(i=0; i<DEPTH-1; i=i+1) begin
+                #1;
+                usedw_pre = usedw;
+                @(posedge clk);
+                data = $random;
+                wr_en = 1;
+                rd_en = 1;
+                din = data;
+                ref_fifo[i+1] = data;
+                @(posedge clk);
+                wr_en = 0;
+                rd_en = 0;
+                #1;
+                if(dout == ref_fifo[i]) 
+    
+                    $display("PASS: data matching");
+                else 
+                    $display("ERROR: data not match at dout: %0h, expected: %0h", dout, ref_fifo[i]);
 
-            $display("PASS data: %0h valid", dout);
+                if(usedw == usedw_pre)
+                    $display("PASS usedw unchanged");
+                else
+                    $display("ERORR usedw changed");
+
+            end
             $display("=== READ WRITE COMBINATION TEST DONE ===");
         end
     endtask
