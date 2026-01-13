@@ -1,15 +1,17 @@
 # =====================================================
 # Reference documents - DO NOT UPLOAD
 # =====================================================
-docs_ref/
+# Ignore all office files by default
 *.pdf
 *.docx
 *.pptx
-docs_pre/
-*.pdf
-*.pptx
-*.docx
 *.xlsx
+
+# BUT allow official docs
+!docs/
+!docs/*.pdf
+!docs/*.docx
+!docs/*.xlsx
 
 # =====================================================
 # QuestaSim / ModelSim generated files
